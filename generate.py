@@ -1,6 +1,7 @@
 import sys
 
 from crossword import *
+import copy
 
 
 class CrosswordCreator():
@@ -270,7 +271,6 @@ class CrosswordCreator():
         return values.
         """
 
-        # We want the minimum of potential values via least value heuristic first, then maximum of neighbors via highest degree heuristic.
         # The code will handle edge cases of all variables having been assigned already by returning null.
         # Optimized via use of degree and potential value variables instead of creating a list, saving linear space
         # and nlogn auxiliariy time (sorting variables based on degrees and potential values).
@@ -322,14 +322,20 @@ class CrosswordCreator():
                 continue
 
             for potential_word in self.domains[var]:
+                # Making deepcopy of the domains to revert any changes in case word assignment doesn't lead to a solution
+                domain_copy = copy.deepcopy(self.domains)
                 assignment[var] = potential_word
+                # Reduces state space; uses list comprehension to create relevant arcs
+                self.ac3([(var, nei) for nei in self.crossword.neighbors(var)])
+
                 if self.consistent(assignment):
                     res = self.backtrack(assignment)
-                # If res is a dictionary instead of none, then it means we reached the base case.
+                    # If res is a dictionary instead of none, then it means we reached a solution.
                     if res:
                         return res
                 # Backtracking.
                 del assignment[var]
+                self.domains = domain_copy
 
 
 def main():
