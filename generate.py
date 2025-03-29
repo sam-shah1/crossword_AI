@@ -102,13 +102,9 @@ class CrosswordCreator():
         """
 
         for var in self.domains:
-            # Check it's not empty.
-            if not self.domains[var]:
-                continue
-
-            # Cannot remove from set during iteration, so must save to remove at end (if any).
             willRemove = set()
             for word in self.domains[var]:
+                # Unary constraint length check.
                 if len(word) != var.length:
                     willRemove.add(word)
             # Removing set intersection, if any.
@@ -135,7 +131,7 @@ class CrosswordCreator():
                 if x_word == y_word:
                     continue
 
-                # Otherwise, we'll retrieve overlapping indices of each var to see if char of words match at respective indices.
+                # Check to see if chars match at respective indices.
                 xi, yi = self.crossword.overlaps[x, y]
                 if x_word[xi] == y_word[yi]:
                     break
@@ -173,7 +169,7 @@ class CrosswordCreator():
                 if not self.domains[var1]:
                     return False
 
-                # If there was a revision, then we need to check if the neighboring nodes of var1 remain consistent with var1.
+                # If there was a revision, then we need to check if the var1's neighboring nodes remain consistent with var1.
                 for affected_var in self.crossword.neighbors(var1) - {var2}:
                     arcs.append((affected_var, var1))
 
@@ -189,7 +185,6 @@ class CrosswordCreator():
         for var in self.domains:
             if (var not in assignment or not assignment[var]):
                 return False
-        # If for loop finishes, then all assignment dictionary is complete.
         return True
 
     def consistent(self, assignment):
@@ -207,10 +202,9 @@ class CrosswordCreator():
                     continue
 
                 nei_word = assignment[nei]
-                # All answers must be distinct; no duplicates.
+                # All answers must be distinct.
                 if nei_word == chosen_word:
                     return False
-                # Check if char values at words are the same at overlapping crossword grid index.
                 xi, yi = self.crossword.overlaps[variable, nei]
                 if chosen_word[xi] != nei_word[yi]:
                     return False
@@ -319,7 +313,7 @@ class CrosswordCreator():
         domain_copy = copy.deepcopy(self.domains)
         for potential_word in self.order_domain_values(var, assignment):
             assignment[var] = potential_word
-            # Reduces state space; uses list comprehension to create relevant arcs
+            # Reduces state space.
             self.ac3([(var, nei) for nei in self.crossword.neighbors(var)])
 
             if self.consistent(assignment):
