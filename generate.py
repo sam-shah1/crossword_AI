@@ -124,15 +124,15 @@ class CrosswordCreator():
         False if no revision was made.
         """
 
-        if x == y:
+        # If no overlap, then there is nothing to satisfy.
+        if (x == y or not self.crossword.overlaps[x, y]):
             return False
 
         revised = False
         willRemove = set()
         for x_word in self.domains[x]:
             for y_word in self.domains[y]:
-                # If no overlap, then there is nothing to satisfy.
-                if (x_word == y_word or not self.crossword.overlaps[x, y]):
+                if x_word == y_word:
                     continue
 
                 # Otherwise, we'll retrieve overlapping indices of each var to see if char of words match at respective indices.
@@ -271,9 +271,6 @@ class CrosswordCreator():
         return values.
         """
 
-        # The code will handle edge cases of all variables having been assigned already by returning null.
-        # Optimized via use of degree and potential value variables instead of creating a list, saving linear space
-        # and nlogn auxiliariy time (sorting variables based on degrees and potential values).
         degree = 0
         least_potential_values = float("inf")
         return_var = None
@@ -313,29 +310,26 @@ class CrosswordCreator():
         # Base case: If assignment is full, then all variables are accounted for.
         # We assume that if var is in assignment, there is a valid value.
         # Can also use assignment_complete function, but since all variables and values are guaranteed
-        # to be valid when base case is reached, assignment_complete is redundant and adds auxiliary time.
+        # to be valid when base case is reached, assignment_complete is redundant and contributes auxiliary time.
         if len(assignment) == len(self.domains):
             return assignment
 
-        for var in self.domains:
-            if var in assignment:
-                continue
+        var = self.select_unassigned_variable(assignment)
+        # Deepcopy to revert any changes in the case word assignment doesn't lead to a solution.
+        domain_copy = copy.deepcopy(self.domains)
+        for potential_word in self.order_domain_values(var, assignment):
+            assignment[var] = potential_word
+            # Reduces state space; uses list comprehension to create relevant arcs
+            self.ac3([(var, nei) for nei in self.crossword.neighbors(var)])
 
-            for potential_word in self.domains[var]:
-                # Making deepcopy of the domains to revert any changes in case word assignment doesn't lead to a solution
-                domain_copy = copy.deepcopy(self.domains)
-                assignment[var] = potential_word
-                # Reduces state space; uses list comprehension to create relevant arcs
-                self.ac3([(var, nei) for nei in self.crossword.neighbors(var)])
-
-                if self.consistent(assignment):
-                    res = self.backtrack(assignment)
-                    # If res is a dictionary instead of none, then it means we reached a solution.
-                    if res:
-                        return res
-                # Backtracking.
-                del assignment[var]
-                self.domains = domain_copy
+            if self.consistent(assignment):
+                res = self.backtrack(assignment)
+                # If res is a dictionary instead of none, then it means we reached a solution.
+                if res:
+                    return res
+            # Backtracking.
+            del assignment[var]
+            self.domains = domain_copy
 
 
 def main():
