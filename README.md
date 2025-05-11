@@ -8,7 +8,7 @@ The constraints that must be satisfied are as follows:
 - Uniqueness Constraint: All words must be different from each other.
 
 ## Motivation for project:
-I am interested in algorithmic-heavy and optimization-heavy projects as I like to think myself foremost a computer scientist. This project involved using custom heuristics that cannot be solved via proofs (hence heuristic), backtracking algorithm that can be illustrated as a tree of potential state spaces, and thus can be optimized through interleaved arc consistency enforcement through inference (which is a nice homage to my background in philosophy) to minimize the nodes needed to be traversed to reach a solution, if any. It also involves the notion of artificial intelligence, which I find to be a fascinating subset of computer science and mathematics.
+I am interested in algorithmic-heavy and optimization-heavy projects as I like to think myself foremost a computer scientist. This project involved using custom heuristics that cannot be solved via proofs (hence heuristic), backtracking algorithm that can be illustrated as a tree of potential state spaces, and thus can be optimized through interleaved arc consistency enforcement through inference (which is a nice homage to my background in philosophy) to minimize the nodes needed to be traversed to reach a solution, if any.
   
 ## Background Context:
 The data file contains structures 0-2 and words 0-2 in .txt format that are used as inputs when running the program. The `crossword.py` creates the crossword itself by creating a 2D matrix/grid given the inputted structure and potential words. `generate.py` begins the simulation and is the crux of the program. Each function in generate.py that I was responsible for is commented to illustrate my thought process, optimizations when present (e.g. select unassigned function), and what those optimizations saved/made efficient (e.g. backtracking search employing inference to reduce state space saving auxiliary time and reducing the recursive stack, but at the cost of auxiliary space created from deepcopying the domain).
@@ -39,8 +39,5 @@ To see what functions I was responsible for, please refer to the specifications 
 ## Usage example:
 `python generate.py data/structure1.txt data/words1.txt` in command line.
 Prerequisite for generation of an image file of a given assignment per `save` function: download pillow using `pip3 install Pillow`.
-
-## What I learned:
-This project was a great learning experience for learning to work within the requirements and limitations imposed by other collaborators' code and design (in this case, the CS50AI team). This project gave me an opportunity to understand a foreign codebase, relation between functions, and their design and to interact with it cohesively. It also allowed me to employ my understanding of modularity and abstraction, readability and clean code, and to seek insight into why the CS50AI team chose certain inputs and outputs (e.g. `ac3` allowing an `arcs` argument in order to start with a different queue of edges for backstracking optimization). 
 
 ### Thank you for visiting my project. 
